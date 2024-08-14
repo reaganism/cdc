@@ -27,7 +27,7 @@ public static class DifferSettingsExtensions
     private sealed class HandleCommonFileTypesProvider : IFileDiffTypeProvider
     {
         private static readonly string[] common_textual_extensions = [".cs", ".csproj", ".resx", "App.config", ".json", ".targets", ".txt", ".bat", ".sh"];
-        private static readonly string[] common_binary_extensions  = [".ico", ".png"];
+        private static readonly string[] common_binary_extensions  = [".ico", ".png", ".dll"];
 
         void IFileDiffTypeProvider.GetFileDiffType(string filePath, ref FileDiffType? diffType, ref bool? ignore)
         {
