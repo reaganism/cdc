@@ -14,7 +14,7 @@ internal static class AssemblyUtil
     {
         object ISimpleTypeProvider<object>.GetPrimitiveType(PrimitiveTypeCode typeCode)
         {
-            throw new NotImplementedException();
+            return null!;
         }
 
         object ISimpleTypeProvider<object>.GetTypeFromDefinition(MetadataReader reader, TypeDefinitionHandle handle, byte rawTypeKind)

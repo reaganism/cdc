@@ -40,9 +40,12 @@ internal static class ResourceUtil
         return () => ExtractResource(projectOutputDirectory, name, resource, projectDir);
     }
 
-    public static IEnumerable<(string path, Resource resource)> GetResourceFiles(MetadataFile metadataFile)
+    public static IEnumerable<(string path, Resource resource)> GetResourceFiles(
+        MetadataFile metadataFile,
+        string[]     embeddedNamespaces
+    )
     {
         return metadataFile.Resources.Where(x => x.ResourceType == ResourceType.Embedded)
-                           .Select(x => (PathUtil.GetOutputPath(x.Name, metadataFile), x));
+                           .Select(x => (PathUtil.GetOutputPath(x.Name, metadataFile, embeddedNamespaces), x));
     }
 }

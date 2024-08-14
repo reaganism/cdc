@@ -40,7 +40,7 @@ Reaganism.CDC.Patching.ProjectPatcher.PatchResult.SingleResult.Header.get -> str
 Reaganism.CDC.Patching.ProjectPatcher.PatchResult.SingleResult.SingleResult() -> void
 Reaganism.CDC.Patching.ProjectPatcher.PatchResult.SingleResult.Summary.get -> string!
 Reaganism.CDC.Utilities.Extensions.DifferSettingsExtensions
-static Reaganism.CDC.Decompilation.ProjectDecompiler.Decompile(string! targetFile, string! sourceOutputDirectory, ICSharpCode.Decompiler.DecompilerSettings? decompilerSettings = null, string![]? decompiledLibraries = null) -> void
+static Reaganism.CDC.Decompilation.ProjectDecompiler.Decompile(string! targetFile, string! sourceOutputDirectory, ICSharpCode.Decompiler.DecompilerSettings? decompilerSettings = null, string![]? decompiledLibraries = null, string![]? embeddedNamespaces = null) -> void
 static Reaganism.CDC.Diffing.ProjectDiffer.Diff(Reaganism.CDC.Diffing.DifferSettings! settings) -> void
 static Reaganism.CDC.Patching.ProjectPatcher.Patch(Reaganism.CDC.Patching.PatcherSettings! settings) -> Reaganism.CDC.Patching.ProjectPatcher.CompiledPatchState
 static Reaganism.CDC.Utilities.Extensions.DifferSettingsExtensions.HandleCommonFileTypes(this Reaganism.CDC.Diffing.DifferSettings! settings) -> Reaganism.CDC.Diffing.DifferSettings!

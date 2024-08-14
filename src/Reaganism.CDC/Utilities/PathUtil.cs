@@ -1,7 +1,9 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 using ICSharpCode.Decompiler.Metadata;
 
@@ -16,10 +18,9 @@ internal static class PathUtil
         return path.Replace('\\', '/');
     }
 
-    public static string GetOutputPath(string path, MetadataFile metadataFile)
+    public static string GetOutputPath(string path, MetadataFile metadataFile, string[] embeddedNamespaces)
     {
-        var fileName = default(string);
-
+        // If this is an assembly.
         if (path.EndsWith(".dll"))
         {
             // ReSharper disable once AccessToModifiedClosure - Captured and
@@ -30,13 +31,6 @@ internal static class PathUtil
             {
                 path = Path.Combine(path[..(path.Length - assemblyReference.Name.Length - 5)], assemblyReference.Name + ".dll");
             }
-
-            fileName = Path.GetFileName(path);
-        }
-        else
-        {
-            // TODO
-            fileName = Path.GetFileName(path);
         }
 
         var rootNamespace = AssemblyUtil.GetAssemblyTitle(metadataFile);
@@ -45,9 +39,37 @@ internal static class PathUtil
             path = path[(rootNamespace.Length + 1)..];
         }
 
-        var pathWithoutFileName = path[..^fileName.Length];
-        pathWithoutFileName = pathWithoutFileName.Replace('\\', '/').Replace('.', '/');
-        return pathWithoutFileName + '/' + fileName;
+        // Short-circuit if there's no directory handling needed.
+        if (!path.Contains('.') && !path.Contains('/') && !path.Contains('\\'))
+        {
+            return path;
+        }
+
+        var bestEmbeddedNamespace = default(string);
+        foreach (var embeddedNamespace in embeddedNamespaces)
+        {
+            if (path.StartsWith(embeddedNamespace + '.') && (bestEmbeddedNamespace is null || embeddedNamespace.Length > bestEmbeddedNamespace.Length))
+            {
+                bestEmbeddedNamespace = embeddedNamespace;
+            }
+        }
+
+        if (bestEmbeddedNamespace is not null)
+        {
+            path = path.Replace(bestEmbeddedNamespace + '.', bestEmbeddedNamespace + '/');
+        }
+
+        path = path.Replace('\\', '/');
+
+        var lastDirectorySeparatorIndex = path.IndexOf('/');
+        if (lastDirectorySeparatorIndex < 0)
+        {
+            lastDirectorySeparatorIndex = path.LastIndexOf('.');
+        }
+
+        return new StringBuilder(path)
+              .Replace('.', '/', 0, lastDirectorySeparatorIndex)
+              .ToString();
     }
 
     public static bool DeleteEmptyDirectories(string directory)

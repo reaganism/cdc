@@ -20,7 +20,8 @@ internal static class ProjectFileUtil
         string                                     projectOutputDirectory,
         ProjectDecompiler.ExposedProjectDecompiler decompiler,
         DecompilerSettings                         settings,
-        List<Action>                               actions
+        List<Action>                               actions,
+        string[]                                   embeddedNamespaces
     )
     {
         using var stream = resource.TryOpenStream();
@@ -31,7 +32,7 @@ internal static class ProjectFileUtil
 
         stream.Position = 0;
         var module = new PEFile(resource.Name, stream, PEStreamOptions.PrefetchEntireImage);
-        AddLibrary(module, projectOutputDirectory, decompiler, settings, actions);
+        AddLibrary(module, projectOutputDirectory, decompiler, settings, actions, embeddedNamespaces);
     }
 
     public static void AddLibrary(
@@ -39,13 +40,14 @@ internal static class ProjectFileUtil
         string                                     projectOutputDirectory,
         ProjectDecompiler.ExposedProjectDecompiler decompiler,
         DecompilerSettings                         settings,
-        List<Action>                               actions
+        List<Action>                               actions,
+        string[]                                   embeddedNamespaces
     )
     {
         var files     = new HashSet<string>();
         var resources = new HashSet<string>();
 
-        ProjectDecompiler.DecompileModule(module, decompiler, actions, files, resources, projectOutputDirectory, settings);
+        ProjectDecompiler.DecompileModule(module, decompiler, actions, files, resources, projectOutputDirectory, settings, embeddedNamespaces);
         actions.Add(
             WriteProjectFile(
                 module,

@@ -56,12 +56,17 @@ public static class ProjectDecompiler
     /// <param name="decompiledLibraries">
     ///     The libraries also being decompiled.
     /// </param>
+    /// <param name="embeddedNamespaces">
+    ///     Known parts of embedded resource names that can be treated as
+    ///     namespaces mirroring directories.
+    /// </param>
     [PublicAPI]
     public static void Decompile(
         string              targetFile,
         string              sourceOutputDirectory,
         DecompilerSettings? decompilerSettings  = null,
-        string[]?           decompiledLibraries = null
+        string[]?           decompiledLibraries = null,
+        string[]?           embeddedNamespaces  = null
     )
     {
         if (!File.Exists(targetFile))
@@ -73,6 +78,8 @@ public static class ProjectDecompiler
         {
             CSharpFormattingOptions = FormattingOptionsFactory.CreateAllman(),
         };
+
+        embeddedNamespaces ??= [];
 
         DeleteOldSource(sourceOutputDirectory);
 
@@ -98,8 +105,8 @@ public static class ProjectDecompiler
                 var libraryResource = mainModule.Resources.SingleOrDefault(x => x.Name.EndsWith(library + ".dll"));
                 if (libraryResource is not null)
                 {
-                    ProjectFileUtil.AddLibrary(mainModule, sourceOutputDirectory, projectDecompiler, decompilerSettings, actions);
-                    exclude.Add(PathUtil.GetOutputPath(libraryResource.Name, mainModule));
+                    ProjectFileUtil.AddEmbeddedLibrary(libraryResource, sourceOutputDirectory, projectDecompiler, decompilerSettings, actions, embeddedNamespaces);
+                    exclude.Add(PathUtil.GetOutputPath(libraryResource.Name, mainModule, embeddedNamespaces));
                 }
                 else
                 {
@@ -115,8 +122,8 @@ public static class ProjectDecompiler
                         using var fs = File.OpenRead(tempModule.FileName);
                         {
                             var libModule = new PEFile(asmRef.Name, fs, PEStreamOptions.PrefetchEntireImage);
-                            ProjectFileUtil.AddLibrary(libModule, sourceOutputDirectory, projectDecompiler, decompilerSettings, actions);
-                            exclude.Add(PathUtil.GetOutputPath(libModule.Name, mainModule));
+                            ProjectFileUtil.AddLibrary(libModule, sourceOutputDirectory, projectDecompiler, decompilerSettings, actions, embeddedNamespaces);
+                            exclude.Add(PathUtil.GetOutputPath(libModule.Name, mainModule, embeddedNamespaces));
                         }
                     }
                     else
@@ -127,7 +134,7 @@ public static class ProjectDecompiler
             }
         }
 
-        DecompileModule(mainModule, projectDecompiler, actions, files, resources, sourceOutputDirectory, decompilerSettings, exclude);
+        DecompileModule(mainModule, projectDecompiler, actions, files, resources, sourceOutputDirectory, decompilerSettings, embeddedNamespaces, exclude);
 
         actions.Add(ProjectFileUtil.WriteProjectFile(mainModule, sourceOutputDirectory, files, resources, decompiledLibraries));
         actions.Add(ProjectFileUtil.WriteCommonConfigurationFile(sourceOutputDirectory));
@@ -165,7 +172,8 @@ public static class ProjectDecompiler
 
     private static IEnumerable<IGrouping<string, TypeDefinitionHandle>> GetCodeFiles(
         MetadataFile             module,
-        ExposedProjectDecompiler decompiler
+        ExposedProjectDecompiler decompiler,
+        string[]                 embeddedNamespaces
     )
     {
         var metadata = module.Metadata;
@@ -181,7 +189,7 @@ public static class ProjectDecompiler
                                     path = Path.Combine(WholeProjectDecompiler.CleanUpPath(metadata.GetString(type.Namespace)), path);
                                 }
 
-                                return PathUtil.GetOutputPath(path, module);
+                                return PathUtil.GetOutputPath(path, module, embeddedNamespaces);
                             },
                             StringComparer.OrdinalIgnoreCase
                         );
@@ -240,14 +248,15 @@ public static class ProjectDecompiler
         HashSet<string>          resourceSet,
         string                   projectOutputDirectory,
         DecompilerSettings       settings,
+        string[]                 embeddedNamespaces,
         List<string>?            exclude     = null,
         string?                  conditional = null
     )
     {
         var projectDirectory = AssemblyUtil.GetAssemblyTitle(module);
 
-        var sources   = GetCodeFiles(module, decompiler).ToList();
-        var resources = ResourceUtil.GetResourceFiles(module).ToList();
+        var sources   = GetCodeFiles(module, decompiler, embeddedNamespaces).ToList();
+        var resources = ResourceUtil.GetResourceFiles(module, embeddedNamespaces).ToList();
 
         if (exclude is not null)
         {
@@ -258,7 +267,7 @@ public static class ProjectDecompiler
         var typeSystem = new DecompilerTypeSystem(module, decompiler.AssemblyResolver, settings);
         actions.AddRange(
             sources.Where(x => sourceSet.Add(x.Key))
-                   .Select(x => DecompileSourceFileAction(typeSystem, x, projectDirectory, projectDirectory, settings, conditional))
+                   .Select(x => DecompileSourceFileAction(typeSystem, x, projectOutputDirectory, projectDirectory, settings, conditional))
         );
 
         if (conditional is not null && resources.Any(x => !resourceSet.Contains(x.path)))
