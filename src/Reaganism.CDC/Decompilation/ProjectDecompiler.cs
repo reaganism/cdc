@@ -126,10 +126,11 @@ public static class ProjectDecompiler
                             exclude.Add(PathUtil.GetOutputPath(libModule.Name, mainModule, embeddedNamespaces));
                         }
                     }
-                    else
+                    // TODO: Error message or something.
+                    /*else
                     {
                         throw new InvalidOperationException($"Cannot find library {library} in the target assembly.");
-                    }
+                    }*/
                 }
             }
         }
