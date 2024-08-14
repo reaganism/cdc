@@ -10,7 +10,7 @@ internal static class ParallelUtil
     public static void Execute(List<Action> actions)
     {
         Parallel.ForEach(
-            Partitioner.Create(actions, EnumerablePartitionerOptions.NoBuffering),
+            actions,
             new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount },
             x => x()
         );
