@@ -157,7 +157,7 @@ public static class ProjectPatcher
         var patchCopyActions = new List<Action>();
         var copyActions      = new List<Action>();
 
-        foreach (var (filePath, relativePath) in PathUtil.EnumerateFiles(settings.ModifiedDirectory))
+        foreach (var (filePath, relativePath) in PathUtil.EnumerateFiles(settings.PatchesDirectory))
         {
             if (relativePath.EndsWith(".patch"))
             {
@@ -175,6 +175,7 @@ public static class ProjectPatcher
                 // This is copied file (whether it be new or a modified binary
                 // file).  Excludes our metadata removed_files.list file.
                 var destination = Path.GetFullPath(Path.Combine(settings.ModifiedDirectory, relativePath));
+                PathUtil.CreateParentDirectory(destination);
 
                 patchCopyActions.Add(() => File.Copy(filePath, destination));
                 newFiles.Add(destination);
@@ -189,7 +190,8 @@ public static class ProjectPatcher
             }
 
             var destination = Path.GetFullPath(Path.Combine(settings.ModifiedDirectory, relativePath));
-            copyActions.Add(() => File.Copy(filePath, destination));
+            PathUtil.CreateParentDirectory(destination);
+            copyActions.Add(() => File.Copy(filePath, destination, true));
             newFiles.Add(destination);
         }
 

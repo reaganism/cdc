@@ -48,6 +48,13 @@ internal static class PathUtil
         var bestEmbeddedNamespace = default(string);
         foreach (var embeddedNamespace in embeddedNamespaces)
         {
+            // Support cases where the file actually has no namespace (in which
+            // one may specify the entire file name).
+            if (path == embeddedNamespace)
+            {
+                return path;
+            }
+
             if (path.StartsWith(embeddedNamespace + '.') && (bestEmbeddedNamespace is null || embeddedNamespace.Length > bestEmbeddedNamespace.Length))
             {
                 bestEmbeddedNamespace = embeddedNamespace;

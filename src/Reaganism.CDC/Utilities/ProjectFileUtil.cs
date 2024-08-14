@@ -232,6 +232,14 @@ internal static class ProjectFileUtil
     private static IEnumerable<string> ApplyWildcards(IEnumerable<string> include, string[] exclude)
     {
         var wildPaths = new HashSet<string>();
+        
+        // Dumb patch: sort `include` by the amount of `/`s it has (effectively
+        // sorting by depth).  This is so we process deeper files first, fixing
+        // a bug where we'd only add one wildcard instead of two even if two is
+        // the correct behavior because we matched a shallower case that only
+        // necessitated a single wildcard.  There are better ways to resolve
+        // this, but this is simple.
+        include = include.OrderByDescending(x => x.Count(y => y == '/'));
 
         foreach (var path in include)
         {
