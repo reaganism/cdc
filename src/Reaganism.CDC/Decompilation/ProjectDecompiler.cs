@@ -154,7 +154,10 @@ public static class ProjectDecompiler
 
             foreach (var file in Directory.GetFiles(sourceOutputDirectory))
             {
-                File.Delete(file);
+                if (File.Exists(file))
+                {
+                    File.Delete(file);
+                }
             }
         }
         else

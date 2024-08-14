@@ -199,7 +199,7 @@ public static class ProjectPatcher
 
         foreach (var (filePath, _) in PathUtil.EnumerateSourceFiles(settings.ModifiedDirectory))
         {
-            if (!newFiles.Contains(Path.GetFullPath(filePath)))
+            if (!newFiles.Contains(Path.GetFullPath(filePath)) && File.Exists(filePath))
             {
                 File.Delete(filePath);
             }

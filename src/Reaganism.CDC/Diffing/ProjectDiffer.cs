@@ -34,7 +34,12 @@ public static class ProjectDiffer
                 // If the file doesn't exist in the original directory, it's
                 // new; we can directly copy it to the output directory.
                 actions.Add(
-                    () => File.Copy(filePath, Path.Combine(settings.PatchesDirectory, relativePath))
+                    () =>
+                    {
+                        var destination = Path.Combine(settings.PatchesDirectory, relativePath);
+                        PathUtil.CreateParentDirectory(destination);
+                        File.Copy(filePath, destination);
+                    }
                 );
             }
             else
@@ -81,7 +86,7 @@ public static class ProjectDiffer
             // Relative path without the ".patch" extension.
             var targetPath = relativePath.EndsWith(".patch") ? relativePath[..^6] : relativePath;
 
-            if (!File.Exists(Path.Combine(settings.ModifiedDirectory, targetPath)))
+            if (!File.Exists(Path.Combine(settings.ModifiedDirectory, targetPath)) && File.Exists(filePath))
             {
                 File.Delete(filePath);
             }
@@ -104,7 +109,10 @@ public static class ProjectDiffer
         }
         else
         {
-            File.Delete(removedFileList);
+            if (File.Exists(removedFileList))
+            {
+                File.Delete(removedFileList);
+            }
         }
     }
 
@@ -124,7 +132,10 @@ public static class ProjectDiffer
         }
         else
         {
-            File.Delete(patchPath);
+            if (File.Exists(patchPath))
+            {
+                File.Delete(patchPath);
+            }
         }
     }
 

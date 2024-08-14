@@ -85,7 +85,7 @@ internal static class PathUtil
                 allEmpty &= Recurse(subDirectory);
             }
 
-            if (!allEmpty || Directory.EnumerateDirectories(directory).Any())
+            if (!allEmpty || Directory.EnumerateFiles(directory).Any())
             {
                 return false;
             }
