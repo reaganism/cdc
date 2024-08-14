@@ -112,7 +112,7 @@ internal static class ProjectFileUtil
 
                     w.WriteStartElement("PropertyGroup");
                     {
-                        w.WriteElementString("OutoutType", outputType);
+                        w.WriteElementString("OutputType", outputType);
                         w.WriteElementString("Nullable",   "enable");
                         w.WriteElementString("Version",    new AssemblyName(module.FullName).Version!.ToString());
 
