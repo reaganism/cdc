@@ -1,7 +1,5 @@
 #nullable enable
 const Reaganism.CDC.Diffing.DifferSettings.REMOVED_FILES_LIST_NAME = "removed_files.list" -> string!
-Reaganism.CDC.Decompilation.DecompilerSettings
-Reaganism.CDC.Decompilation.DecompilerSettings.DecompilerSettings() -> void
 Reaganism.CDC.Decompilation.ProjectDecompiler
 Reaganism.CDC.Diffing.DifferSettings
 Reaganism.CDC.Diffing.DifferSettings.AddCanDiffFileProvider(Reaganism.CDC.Diffing.IFileDiffTypeProvider! provider) -> void
