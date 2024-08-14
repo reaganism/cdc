@@ -79,7 +79,7 @@ internal static class ProjectFileUtil
         );
     }
 
-    public static Action WriteProjectFile(
+    private static Action WriteProjectFile(
         MetadataFile          module,
         string                outputType,
         string                projectOutputDirectory,
@@ -172,7 +172,11 @@ internal static class ProjectFileUtil
             {
                 w.WriteStartElement("Project");
                 {
-                    // TODO: Do we still need this?
+                    w.WriteStartElement("PropertyGroup");
+                    {
+                        w.WriteElementString("AllowUnsafeBlocks", "true");
+                    }
+                    w.WriteEndElement();
                 }
                 w.WriteEndElement();
             }
@@ -232,7 +236,7 @@ internal static class ProjectFileUtil
     private static IEnumerable<string> ApplyWildcards(IEnumerable<string> include, string[] exclude)
     {
         var wildPaths = new HashSet<string>();
-        
+
         // Dumb patch: sort `include` by the amount of `/`s it has (effectively
         // sorting by depth).  This is so we process deeper files first, fixing
         // a bug where we'd only add one wildcard instead of two even if two is
