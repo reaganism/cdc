@@ -80,9 +80,15 @@ public static class ProjectPatcher
         [PublicAPI]
         public int Fuzzies { [PublicAPI] get; }
 
+        /// <summary>
+        ///     The results of each patch.
+        /// </summary>
+        [PublicAPI]
+        public PatchResult[] Results { [PublicAPI] get; }
+
         internal CompiledPatchState(PatcherState state)
         {
-            var patchResults = state.GetResults();
+            var patchResults = state.GetResults().ToList();
             var allResults   = patchResults.SelectMany(x => x.Results).ToList();
             {
                 Successes = allResults.Count(x => x.Success);
@@ -92,6 +98,44 @@ public static class ProjectPatcher
                 Offsets   = allResults.Count(x => x.Mode == Patcher.Mode.Offset);
                 Fuzzies   = allResults.Count(x => x.Mode == Patcher.Mode.Fuzzy);
             }
+
+            Results = patchResults.Select(x => new PatchResult(x)).ToArray();
+        }
+    }
+
+    [PublicAPI]
+    public readonly struct PatchResult
+    {
+        [PublicAPI]
+        public readonly struct SingleResult
+        {
+            [PublicAPI]
+            public string Header { [PublicAPI] get; }
+
+            [PublicAPI]
+            public string Summary { [PublicAPI] get; }
+
+            internal SingleResult(Patcher.Result result)
+            {
+                Header  = FBI.Patch.GetHeader(result.Patch, false);
+                Summary = result.Summary();
+            }
+        }
+
+        [PublicAPI]
+        public string OriginalPath { [PublicAPI] get; }
+
+        [PublicAPI]
+        public string ModifiedPath { [PublicAPI] get; }
+
+        [PublicAPI]
+        public SingleResult[] Results { [PublicAPI] get; }
+
+        internal PatchResult(FilePatcher patchResult)
+        {
+            OriginalPath = patchResult.OriginalPath;
+            ModifiedPath = patchResult.ModifiedPath;
+            Results      = patchResult.Results.Select(x => new SingleResult(x)).ToArray();
         }
     }
 

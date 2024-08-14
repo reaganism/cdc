@@ -26,8 +26,18 @@ Reaganism.CDC.Patching.ProjectPatcher.CompiledPatchState.Exacts.get -> int
 Reaganism.CDC.Patching.ProjectPatcher.CompiledPatchState.Failures.get -> int
 Reaganism.CDC.Patching.ProjectPatcher.CompiledPatchState.Fuzzies.get -> int
 Reaganism.CDC.Patching.ProjectPatcher.CompiledPatchState.Offsets.get -> int
+Reaganism.CDC.Patching.ProjectPatcher.CompiledPatchState.Results.get -> Reaganism.CDC.Patching.ProjectPatcher.PatchResult[]!
 Reaganism.CDC.Patching.ProjectPatcher.CompiledPatchState.Successes.get -> int
 Reaganism.CDC.Patching.ProjectPatcher.CompiledPatchState.Warnings.get -> int
+Reaganism.CDC.Patching.ProjectPatcher.PatchResult
+Reaganism.CDC.Patching.ProjectPatcher.PatchResult.ModifiedPath.get -> string!
+Reaganism.CDC.Patching.ProjectPatcher.PatchResult.OriginalPath.get -> string!
+Reaganism.CDC.Patching.ProjectPatcher.PatchResult.PatchResult() -> void
+Reaganism.CDC.Patching.ProjectPatcher.PatchResult.Results.get -> Reaganism.CDC.Patching.ProjectPatcher.PatchResult.SingleResult[]!
+Reaganism.CDC.Patching.ProjectPatcher.PatchResult.SingleResult
+Reaganism.CDC.Patching.ProjectPatcher.PatchResult.SingleResult.Header.get -> string!
+Reaganism.CDC.Patching.ProjectPatcher.PatchResult.SingleResult.SingleResult() -> void
+Reaganism.CDC.Patching.ProjectPatcher.PatchResult.SingleResult.Summary.get -> string!
 Reaganism.CDC.Utilities.Extensions.DifferSettingsExtensions
 static Reaganism.CDC.Diffing.ProjectDiffer.Diff(Reaganism.CDC.Diffing.DifferSettings! settings) -> void
 static Reaganism.CDC.Patching.ProjectPatcher.Patch(Reaganism.CDC.Patching.PatcherSettings! settings) -> Reaganism.CDC.Patching.ProjectPatcher.CompiledPatchState
