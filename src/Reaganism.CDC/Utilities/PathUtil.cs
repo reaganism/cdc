@@ -112,14 +112,14 @@ internal static class PathUtil
     {
         // Sanitization: remove or add directory separator character as needed.
         {
-            if (directory[^1] == Path.DirectorySeparatorChar)
+            if (fullPath[^1] == Path.DirectorySeparatorChar)
             {
-                directory = directory[..^1];
+                fullPath = fullPath[..^1];
             }
 
-            if (fullPath[^1] != Path.DirectorySeparatorChar)
+            if (directory[^1] != Path.DirectorySeparatorChar)
             {
-                fullPath += Path.DirectorySeparatorChar;
+                directory += Path.DirectorySeparatorChar;
             }
         }
 
