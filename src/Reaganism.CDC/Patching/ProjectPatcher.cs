@@ -169,6 +169,8 @@ public static class ProjectPatcher
                         newFiles.Add(Path.GetFullPath(PathUtil.NormalizePath(patcher.ModifiedPath)));
                     }
                 );
+
+                noCopy.Add(relativePath[..^6]);
             }
             else if (relativePath != removedFilesList)
             {
