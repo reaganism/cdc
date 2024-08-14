@@ -120,8 +120,8 @@ public static class ProjectDiffer
     {
         var patchFile = Differ.DiffFiles(
             new LineMatchedDiffer(),
-            Path.Combine(settings.OriginalDirectory, relativePath),
-            Path.Combine(settings.ModifiedDirectory, relativePath)
+            Path.Combine(settings.OriginalDirectory, relativePath).Replace('\\', '/'),
+            Path.Combine(settings.ModifiedDirectory, relativePath).Replace('\\', '/')
         );
 
         var patchPath = Path.Combine(settings.PatchesDirectory, relativePath + ".patch");
