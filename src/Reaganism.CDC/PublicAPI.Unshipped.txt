@@ -1,1 +1,17 @@
 #nullable enable
+const Reaganism.CDC.Diffing.DifferSettings.REMOVED_FILES_LIST_NAME = "removed_files.list" -> string!
+Reaganism.CDC.Diffing.DifferSettings
+Reaganism.CDC.Diffing.DifferSettings.AddCanDiffFileProvider(Reaganism.CDC.Diffing.IFileDiffTypeProvider! provider) -> void
+Reaganism.CDC.Diffing.DifferSettings.DifferSettings(string! originalDirectory, string! modifiedDirectory, string! patchesDirectory) -> void
+Reaganism.CDC.Diffing.DifferSettings.GetFileDiffType(string! filePath, out Reaganism.CDC.Diffing.FileDiffType diffType, out bool ignore) -> void
+Reaganism.CDC.Diffing.DifferSettings.ModifiedDirectory.get -> string!
+Reaganism.CDC.Diffing.DifferSettings.OriginalDirectory.get -> string!
+Reaganism.CDC.Diffing.DifferSettings.PatchesDirectory.get -> string!
+Reaganism.CDC.Diffing.FileDiffType
+Reaganism.CDC.Diffing.FileDiffType.BinaryDiff = 1 -> Reaganism.CDC.Diffing.FileDiffType
+Reaganism.CDC.Diffing.FileDiffType.TextualDiff = 0 -> Reaganism.CDC.Diffing.FileDiffType
+Reaganism.CDC.Diffing.IFileDiffTypeProvider
+Reaganism.CDC.Diffing.IFileDiffTypeProvider.GetFileDiffType(string! filePath, ref Reaganism.CDC.Diffing.FileDiffType? diffType, ref bool? ignore) -> void
+Reaganism.CDC.Utilities.Extensions.DifferSettingsExtensions
+static Reaganism.CDC.Utilities.Extensions.DifferSettingsExtensions.HandleCommonFileTypes(this Reaganism.CDC.Diffing.DifferSettings! settings) -> Reaganism.CDC.Diffing.DifferSettings!
+static Reaganism.CDC.Utilities.Extensions.DifferSettingsExtensions.IgnoreCommonDirectories(this Reaganism.CDC.Diffing.DifferSettings! settings) -> Reaganism.CDC.Diffing.DifferSettings!

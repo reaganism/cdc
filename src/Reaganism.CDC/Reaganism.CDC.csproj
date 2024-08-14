@@ -38,4 +38,8 @@
         <AdditionalFiles Include="PublicAPI.Unshipped.txt"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <ProjectReference Include="..\fbi\src\Reaganism.FBI\Reaganism.FBI.csproj"/>
+    </ItemGroup>
+
 </Project>
