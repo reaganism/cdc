@@ -251,7 +251,7 @@ internal static class ProjectFileUtil
                     break;
                 }
 
-                wildPath = path;
+                wildPath = parent;
                 if (cards.Length < 2)
                 {
                     cards += '*';
