@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
+using JetBrains.Annotations;
+
 using Reaganism.CDC.Utilities;
 using Reaganism.FBI.Diffing;
 
@@ -11,8 +13,14 @@ namespace Reaganism.CDC.Diffing;
 /// <summary>
 ///     Handles diffing a project.
 /// </summary>
+[PublicAPI]
 public static class ProjectDiffer
 {
+    /// <summary>
+    ///     Diffs the project as specified in the settings.
+    /// </summary>
+    /// <param name="settings">The project diff settings.</param>
+    [PublicAPI]
     public static void Diff(DifferSettings settings)
     {
         var actions = new List<Action>();

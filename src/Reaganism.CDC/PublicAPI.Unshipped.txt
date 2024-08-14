@@ -12,6 +12,8 @@ Reaganism.CDC.Diffing.FileDiffType.BinaryDiff = 1 -> Reaganism.CDC.Diffing.FileD
 Reaganism.CDC.Diffing.FileDiffType.TextualDiff = 0 -> Reaganism.CDC.Diffing.FileDiffType
 Reaganism.CDC.Diffing.IFileDiffTypeProvider
 Reaganism.CDC.Diffing.IFileDiffTypeProvider.GetFileDiffType(string! filePath, ref Reaganism.CDC.Diffing.FileDiffType? diffType, ref bool? ignore) -> void
+Reaganism.CDC.Diffing.ProjectDiffer
 Reaganism.CDC.Utilities.Extensions.DifferSettingsExtensions
+static Reaganism.CDC.Diffing.ProjectDiffer.Diff(Reaganism.CDC.Diffing.DifferSettings! settings) -> void
 static Reaganism.CDC.Utilities.Extensions.DifferSettingsExtensions.HandleCommonFileTypes(this Reaganism.CDC.Diffing.DifferSettings! settings) -> Reaganism.CDC.Diffing.DifferSettings!
 static Reaganism.CDC.Utilities.Extensions.DifferSettingsExtensions.IgnoreCommonDirectories(this Reaganism.CDC.Diffing.DifferSettings! settings) -> Reaganism.CDC.Diffing.DifferSettings!
