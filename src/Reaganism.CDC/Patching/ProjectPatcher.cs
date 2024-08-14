@@ -38,24 +38,45 @@ public static class ProjectPatcher
         }
     }
 
+    /// <summary>
+    ///     The finalized report of a patch operation.
+    /// </summary>
     [PublicAPI]
     public readonly struct CompiledPatchState
     {
+        /// <summary>
+        ///     The number of successful patches.
+        /// </summary>
         [PublicAPI]
         public int Successes { [PublicAPI] get; }
 
+        /// <summary>
+        ///     The number of failed patches.
+        /// </summary>
         [PublicAPI]
         public int Failures { [PublicAPI] get; }
 
+        /// <summary>
+        ///     The number of patches that resulted in an offset warning.
+        /// </summary>
         [PublicAPI]
         public int Warnings { [PublicAPI] get; }
 
+        /// <summary>
+        ///     The number of exact patches.
+        /// </summary>
         [PublicAPI]
         public int Exacts { [PublicAPI] get; }
 
+        /// <summary>
+        ///     The number of offset patches.
+        /// </summary>
         [PublicAPI]
         public int Offsets { [PublicAPI] get; }
 
+        /// <summary>
+        ///     The number of fuzzy patches.
+        /// </summary>
         [PublicAPI]
         public int Fuzzies { [PublicAPI] get; }
 
