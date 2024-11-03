@@ -1,6 +1,6 @@
 using JetBrains.Annotations;
 
-using Reaganism.FBI.Patching;
+using Reaganism.FBI.Textual.Fuzzy.Patching;
 
 namespace Reaganism.CDC.Patching;
 

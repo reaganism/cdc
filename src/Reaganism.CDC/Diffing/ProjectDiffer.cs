@@ -2,11 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 using JetBrains.Annotations;
 
 using Reaganism.CDC.Utilities;
-using Reaganism.FBI.Diffing;
+using Reaganism.FBI.Textual.Fuzzy;
+using Reaganism.FBI.Textual.Fuzzy.Diffing;
+using Reaganism.FBI.Utilities;
 
 namespace Reaganism.CDC.Diffing;
 
@@ -116,19 +119,71 @@ public static class ProjectDiffer
         }
     }
 
-    private static void DiffFile(DifferSettings settings, string relativePath)
+    private static unsafe void DiffFile(DifferSettings settings, string relativePath)
     {
-        var patchFile = Differ.DiffFiles(
+        // Is this size excessive?
+        const long max_file_bytes_for_stack = 1024 * 200;
+
+        Utf16String originalText;
+        {
+            var originalPath = Path.Combine(settings.OriginalDirectory, relativePath).Replace('\\', '/');
+            var originalInfo = new FileInfo(originalPath);
+            if (originalInfo.Length <= max_file_bytes_for_stack)
+            {
+                using var fs = new FileStream(originalPath, FileMode.Open, FileAccess.Read, FileShare.Read);
+
+                var pBytes = (Span<byte>)stackalloc byte[(int)originalInfo.Length];
+                var pChars = (Span<char>)stackalloc char[(int)originalInfo.Length];
+                _ = fs.Read(pBytes);
+                Encoding.UTF8.GetChars(pBytes, pChars);
+
+                originalText = Utf16String.FromSpan(pChars);
+            }
+            else
+            {
+                originalText = Utf16String.FromString(File.ReadAllText(originalPath));
+            }
+        }
+
+        Utf16String modifiedText;
+        {
+            var modifiedPath = Path.Combine(settings.ModifiedDirectory, relativePath).Replace('\\', '/');
+            var modifiedInfo = new FileInfo(modifiedPath);
+            if (modifiedInfo.Length <= max_file_bytes_for_stack)
+            {
+                using var fs = new FileStream(modifiedPath, FileMode.Open, FileAccess.Read, FileShare.Read);
+
+                var pBytes = (Span<byte>)stackalloc byte[(int)modifiedInfo.Length];
+                var pChars = (Span<char>)stackalloc char[(int)modifiedInfo.Length];
+                _ = fs.Read(pBytes);
+                Encoding.UTF8.GetChars(pBytes, pChars);
+
+                modifiedText = Utf16String.FromSpan(pChars);
+            }
+            else
+            {
+                modifiedText = Utf16String.FromString(File.ReadAllText(modifiedPath));
+            }
+        }
+
+        var patches = FuzzyDiffer.DiffTexts(
             new LineMatchedDiffer(),
-            Path.Combine(settings.OriginalDirectory, relativePath).Replace('\\', '/'),
-            Path.Combine(settings.ModifiedDirectory, relativePath).Replace('\\', '/')
-        );
+            SplitText(originalText),
+            SplitText(modifiedText)
+        ).ToArray();
 
         var patchPath = Path.Combine(settings.PatchesDirectory, relativePath + ".patch");
-        if (patchFile.Patches.Count != 0)
+        if (patches.Length != 0)
         {
             PathUtil.CreateParentDirectory(patchPath);
-            File.WriteAllText(patchPath, patchFile.ToString(true));
+            File.WriteAllText(
+                patchPath,
+                new FuzzyPatchFile(
+                    patches,
+                    Utf16String.FromString(Path.Combine(settings.OriginalDirectory, relativePath).Replace('\\', '/')),
+                    Utf16String.FromString(Path.Combine(settings.ModifiedDirectory, relativePath).Replace('\\', '/'))
+                ).ToString(true)
+            );
         }
         else
         {
@@ -165,5 +220,41 @@ public static class ProjectDiffer
         {
             File.Copy(modifiedFilePath, Path.Combine(settings.PatchesDirectory, relativePath));
         }
+    }
+
+    private static unsafe List<Utf16String> SplitText(Utf16String text)
+    {
+        var span = text.Span;
+
+        var lineCount = 0;
+        for (var i = 0; i < text.Length; i++)
+        {
+            if (span[i] == '\n')
+            {
+                lineCount++;
+            }
+        }
+
+        var ranges = (Span<Range>)stackalloc Range[lineCount];
+        if (span.Split(ranges, '\n') != ranges.Length)
+        {
+            throw new Exception("Line count mismatch");
+        }
+
+        var result = new List<Utf16String>(ranges.Length);
+
+        for (var i = 0; i < ranges.Length; i++)
+        {
+            var (start, length) = ranges[i].GetOffsetAndLength(text.Length);
+
+            if (span[start + length - 1] == '\r')
+            {
+                length--;
+            }
+
+            result.Add(text.Slice(start, length));
+        }
+
+        return result;
     }
 }

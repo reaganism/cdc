@@ -4,16 +4,16 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
-using Reaganism.FBI;
-using Reaganism.FBI.Patching;
+using Reaganism.FBI.Textual.Fuzzy;
+using Reaganism.FBI.Textual.Fuzzy.Patching;
 
 namespace Reaganism.CDC.Patching;
 
-internal sealed class FilePatcher(PatchFile patchFile, string rootDir)
+internal sealed class FilePatcher(FuzzyPatchFile patchFile, string rootDir)
 {
-    public string OriginalPath => Path.Combine(rootDir, patchFile.OriginalPath ?? throw new InvalidOperationException());
+    public string OriginalPath => Path.Combine(rootDir, patchFile.OriginalPath?.Span.ToString() ?? throw new InvalidOperationException());
 
-    public string ModifiedPath => Path.Combine(rootDir, patchFile.ModifiedPath ?? throw new InvalidOperationException());
+    public string ModifiedPath => Path.Combine(rootDir, patchFile.ModifiedPath?.Span.ToString() ?? throw new InvalidOperationException());
 
     public List<Patcher.Result> Results { get; private set; } = [];
 
@@ -38,6 +38,6 @@ internal sealed class FilePatcher(PatchFile patchFile, string rootDir)
 
     public static FilePatcher FromPatchFile(string patchFilePath, string rootDir = "")
     {
-        return new FilePatcher(PatchFile.FromText(File.ReadAllText(patchFilePath)), rootDir);
+        return new FilePatcher(FuzzyPatchFile.FromText(File.ReadAllText(patchFilePath)), rootDir);
     }
 }

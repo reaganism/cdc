@@ -8,7 +8,8 @@ using JetBrains.Annotations;
 
 using Reaganism.CDC.Diffing;
 using Reaganism.CDC.Utilities;
-using Reaganism.FBI.Patching;
+using Reaganism.FBI.Textual.Fuzzy;
+using Reaganism.FBI.Textual.Fuzzy.Patching;
 
 namespace Reaganism.CDC.Patching;
 
@@ -117,7 +118,7 @@ public static class ProjectPatcher
 
             internal SingleResult(Patcher.Result result)
             {
-                Header  = FBI.Patch.GetHeader(result.Patch, false);
+                Header  = FuzzyPatchHeader.GetHeader(result.Patch, false);
                 Summary = result.Summary();
             }
         }
