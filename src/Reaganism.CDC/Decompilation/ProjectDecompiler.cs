@@ -26,14 +26,19 @@ namespace Reaganism.CDC.Decompilation;
 [PublicAPI]
 public static class ProjectDecompiler
 {
-    internal sealed class ExposedProjectDecompiler : WholeProjectDecompiler
+    internal sealed class ExposedProjectDecompiler(
+        DecompilerSettings  settings,
+        IAssemblyResolver   assemblyResolver,
+        IDebugInfoProvider? debugInfoProvider,
+        IProjectFileWriter? projectFileWriter
+    ) : WholeProjectDecompiler(
+        settings,
+        assemblyResolver,
+        projectFileWriter,
+        assemblyReferenceClassifier: null,
+        debugInfoProvider: debugInfoProvider
+    )
     {
-        public ExposedProjectDecompiler(IAssemblyResolver assemblyResolver) : base(assemblyResolver) { }
-
-        public ExposedProjectDecompiler(DecompilerSettings settings, IAssemblyResolver assemblyResolver, IProjectFileWriter? projectWriter, AssemblyReferenceClassifier? assemblyReferenceClassifier, IDebugInfoProvider? debugInfoProvider) : base(settings, assemblyResolver, projectWriter, assemblyReferenceClassifier, debugInfoProvider) { }
-
-        public ExposedProjectDecompiler(DecompilerSettings settings, Guid projectGuid, IAssemblyResolver assemblyResolver, IProjectFileWriter? projectWriter, AssemblyReferenceClassifier? assemblyReferenceClassifier, IDebugInfoProvider? debugInfoProvider) : base(settings, projectGuid, assemblyResolver, projectWriter, assemblyReferenceClassifier, debugInfoProvider) { }
-
         // Expose as a public member.
         public new bool IncludeTypeWhenDecompilingProject(MetadataFile module, TypeDefinitionHandle type)
         {
@@ -66,7 +71,10 @@ public static class ProjectDecompiler
         string              sourceOutputDirectory,
         DecompilerSettings? decompilerSettings  = null,
         string[]?           decompiledLibraries = null,
-        string[]?           embeddedNamespaces  = null
+        string[]?           embeddedNamespaces  = null,
+        IAssemblyResolver?  assemblyResolver    = null,
+        IDebugInfoProvider? debugInfoProvider   = null,
+        IProjectFileWriter? projectFileWriter   = null
     )
     {
         if (!File.Exists(targetFile))
@@ -87,10 +95,9 @@ public static class ProjectDecompiler
 
         var projectDecompiler = new ExposedProjectDecompiler(
             decompilerSettings,
-            new EmbeddedAssemblyResolver(mainModule, mainModule.DetectTargetFrameworkId()),
-            null,
-            null,
-            null
+            assemblyResolver ?? new EmbeddedAssemblyResolver(mainModule, mainModule.DetectTargetFrameworkId()),
+            debugInfoProvider,
+            projectFileWriter
         );
 
         var actions   = new List<Action>();
