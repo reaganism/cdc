@@ -74,7 +74,8 @@ public static class ProjectDecompiler
         string[]?           embeddedNamespaces  = null,
         IAssemblyResolver?  assemblyResolver    = null,
         IDebugInfoProvider? debugInfoProvider   = null,
-        IProjectFileWriter? projectFileWriter   = null
+        IProjectFileWriter? projectFileWriter   = null,
+        bool                deleteOldSource     = true
     )
     {
         if (!File.Exists(targetFile))
@@ -89,7 +90,10 @@ public static class ProjectDecompiler
 
         embeddedNamespaces ??= [];
 
-        DeleteOldSource(sourceOutputDirectory);
+        if (deleteOldSource)
+        {
+            DeleteOldSource(sourceOutputDirectory);
+        }
 
         var mainModule = MetadataUtil.ReadModule(targetFile);
 
