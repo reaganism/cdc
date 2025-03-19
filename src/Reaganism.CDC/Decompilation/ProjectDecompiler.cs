@@ -75,7 +75,8 @@ public static class ProjectDecompiler
         IAssemblyResolver?  assemblyResolver    = null,
         IDebugInfoProvider? debugInfoProvider   = null,
         IProjectFileWriter? projectFileWriter   = null,
-        bool                deleteOldSource     = true
+        bool                deleteOldSource     = true,
+        string?             projectName         = null
     )
     {
         if (!File.Exists(targetFile))
@@ -146,7 +147,7 @@ public static class ProjectDecompiler
             }
         }
 
-        DecompileModule(mainModule, projectDecompiler, actions, files, resources, sourceOutputDirectory, decompilerSettings, embeddedNamespaces, exclude);
+        DecompileModule(mainModule, projectDecompiler, actions, files, resources, sourceOutputDirectory, decompilerSettings, embeddedNamespaces, exclude, projectName: projectName);
 
         actions.Add(ProjectFileUtil.WriteProjectFile(mainModule, sourceOutputDirectory, files, resources, decompiledLibraries));
         actions.Add(ProjectFileUtil.WriteCommonConfigurationFile(sourceOutputDirectory));
@@ -265,10 +266,11 @@ public static class ProjectDecompiler
         DecompilerSettings       settings,
         string[]                 embeddedNamespaces,
         List<string>?            exclude     = null,
-        string?                  conditional = null
+        string?                  conditional = null,
+        string?                  projectName = null
     )
     {
-        var projectDirectory = AssemblyUtil.GetAssemblyTitle(module);
+        var projectDirectory = projectName ?? AssemblyUtil.GetAssemblyTitle(module);
 
         var sources   = GetCodeFiles(module, decompiler, embeddedNamespaces).ToList();
         var resources = ResourceUtil.GetResourceFiles(module, embeddedNamespaces).ToList();

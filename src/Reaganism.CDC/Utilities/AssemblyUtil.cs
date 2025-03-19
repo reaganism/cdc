@@ -69,7 +69,13 @@ internal static class AssemblyUtil
             return title;
         }
 
-        return assembly_title_cache[metadataFile.FileName] = GetCustomAttributes(metadataFile)[nameof(AssemblyTitleAttribute)];
+        var customAttributes = GetCustomAttributes(metadataFile);
+        if (customAttributes.TryGetValue(nameof(AssemblyTitleAttribute), out title))
+        {
+            return assembly_title_cache[metadataFile.FileName] = title;
+        }
+
+        return assembly_title_cache[metadataFile.FileName] = metadataFile.FileName.Replace(".dll", "");
     }
 
     public static Dictionary<string, string> GetCustomAttributes(MetadataFile metadataFile)
