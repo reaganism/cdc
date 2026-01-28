@@ -60,13 +60,17 @@ public static class ProjectDecompiler
     ///     Known parts of embedded resource names that can be treated as
     ///     namespaces mirroring directories.
     /// </param>
+    /// <param name="polyfilledLibraries">
+    ///     Externally-provided libraries.
+    /// </param>
     [PublicAPI]
     public static void Decompile(
         string              targetFile,
         string              sourceOutputDirectory,
         DecompilerSettings? decompilerSettings  = null,
         string[]?           decompiledLibraries = null,
-        string[]?           embeddedNamespaces  = null
+        string[]?           embeddedNamespaces  = null,
+        string[]?           polyfilledLibraries  = null
     )
     {
         if (!File.Exists(targetFile))
@@ -85,9 +89,10 @@ public static class ProjectDecompiler
 
         var mainModule = MetadataUtil.ReadModule(targetFile);
 
+        var resolver = new EmbeddedAssemblyResolver(mainModule, mainModule.DetectTargetFrameworkId());
         var projectDecompiler = new ExposedProjectDecompiler(
             decompilerSettings,
-            new EmbeddedAssemblyResolver(mainModule, mainModule.DetectTargetFrameworkId()),
+            resolver,
             null,
             null,
             null
@@ -97,6 +102,17 @@ public static class ProjectDecompiler
         var files     = new HashSet<string>();
         var resources = new HashSet<string>();
         var exclude   = new List<string>();
+
+        if (polyfilledLibraries is not null)
+        {
+            foreach (var library in polyfilledLibraries)
+            {
+                using var fs = File.OpenRead(library);
+                var module = new PEFile(Path.GetFileNameWithoutExtension(library), fs, PEStreamOptions.PrefetchEntireImage);
+                ProjectFileUtil.AddLibrary(module, sourceOutputDirectory, projectDecompiler, decompilerSettings, actions, embeddedNamespaces);
+                resolver.AddModule(module);
+            }
+        }
 
         if (decompiledLibraries is not null)
         {

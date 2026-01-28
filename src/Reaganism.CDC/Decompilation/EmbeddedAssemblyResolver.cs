@@ -19,6 +19,7 @@ internal sealed class EmbeddedAssemblyResolver : IAssemblyResolver
     // resolve the assembly.  We keep this anyway since we don't want to keep
     // repeating our resolution logic.
     private readonly Dictionary<string, MetadataFile?> cache = [];
+    private readonly Dictionary<string, PEFile> modules = [];
 
     public EmbeddedAssemblyResolver(PEFile metadataFile, string targetFramework)
     {
@@ -34,6 +35,11 @@ internal sealed class EmbeddedAssemblyResolver : IAssemblyResolver
 
             resolver.AddSearchDirectory(dirName);
         }
+    }
+
+    public void AddModule(PEFile module)
+    {
+        modules[module.FullName] = module;
     }
 
     MetadataFile? IAssemblyResolver.Resolve(IAssemblyReference reference)
@@ -74,6 +80,11 @@ internal sealed class EmbeddedAssemblyResolver : IAssemblyResolver
                     // TODO: This doesn't necessarily require an error.
                     throw new InvalidOperationException($"Failed to open stream for embedded assembly: {resource.Name}");
                 }
+            }
+
+            if (module is null && modules.TryGetValue(reference.FullName, out var peFile))
+            {
+                module = peFile;
             }
 
             // If we haven't found the assembly as an embedded resource, fall
