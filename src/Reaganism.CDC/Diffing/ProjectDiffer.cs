@@ -150,11 +150,18 @@ public static class ProjectDiffer
         var originalFileSize = new FileInfo(originalFilePath).Length;
         var modifiedFileSize = new FileInfo(modifiedFilePath).Length;
 
+        var targetFile = Path.Combine(settings.PatchesDirectory, relativePath);
+        if (Path.GetDirectoryName(Path.Combine(settings.PatchesDirectory, relativePath)) is { } targetDir)
+        {
+            Directory.CreateDirectory(targetDir);
+        }
+
         // Quick check: we know they files aren't the same if their sizes are
         // different.
         if (originalFileSize != modifiedFileSize)
         {
-            File.Copy(modifiedFilePath, Path.Combine(settings.PatchesDirectory, relativePath));
+            File.Copy(modifiedFilePath, Path.Combine(settings.PatchesDirectory, relativePath), overwrite: true);
+            return;
         }
 
         // Now we need to actually check whether their bytes are the same.
@@ -163,7 +170,7 @@ public static class ProjectDiffer
 
         if (!originalFileBytes.SequenceEqual(modifiedFileBytes))
         {
-            File.Copy(modifiedFilePath, Path.Combine(settings.PatchesDirectory, relativePath));
+            File.Copy(modifiedFilePath, Path.Combine(settings.PatchesDirectory, relativePath), overwrite: true);
         }
     }
 }
